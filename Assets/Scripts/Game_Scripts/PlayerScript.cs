@@ -6,15 +6,17 @@ public class PlayerScript : MonoBehaviour
 {
     public GameObject Player;
     public GameObject Spawn;
-    public PlayerObjScript ObjScript;
     public float Speed;
     public float Jump_force;
+    public Vector3 oldpos;
     private bool Moving;
+    private bool On_ground;
+
     // Start is called before the first frame update
     void Start()
     {
+        On_ground = true;
         Moving = true;
-        ObjScript.Set_Jump_force(Jump_force);
     }
 
     // Update is called once per frame
@@ -22,13 +24,18 @@ public class PlayerScript : MonoBehaviour
     {
         if (Moving)
         {
+            oldpos = transform.position;
             transform.position += new Vector3(-Speed * 0.5f, 0.0f, 0.0f);
+            if (oldpos == transform.position)
+            {
+                StartCoroutine(Respawn());
+            }
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                if (ObjScript.Get_On_ground())
+                if (Get_On_ground())
                 {
                     Debug.Log("Jump");
-                    ObjScript.Jump();
+                    Jump();
                 }
                 else
                 {
@@ -36,5 +43,40 @@ public class PlayerScript : MonoBehaviour
                 }
             }
         }
+    }
+    public void Jump()
+    {
+        GetComponent<Rigidbody>().AddForce(0.0f, Jump_force, 0.0f);
+        On_ground = false;
+    }
+    public void Set_Jump_force(float jump)
+    {
+        Jump_force = jump;
+    }
+
+    public bool Get_On_ground()
+    {
+        return On_ground;
+    }
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.tag == "Ground" || collision.collider.tag == "Block")
+        {
+            On_ground = true;
+        }
+        else if (collision.collider.tag == "Spikey")
+        {
+            StartCoroutine(Respawn());
+        }
+    }
+    IEnumerator Respawn()
+    {
+        Debug.Log("Die");
+        Moving = false;
+        Player.SetActive(false);
+        yield return new WaitForSeconds(0.75f);
+        transform.position = Spawn.transform.position;
+        Player.SetActive(true);
+        Moving = true;
     }
 }
