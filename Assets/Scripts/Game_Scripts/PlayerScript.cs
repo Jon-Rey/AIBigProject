@@ -6,8 +6,8 @@ public class PlayerScript : MonoBehaviour
 {
     public GameObject Player;
     public GameObject Spawn;
-    public float Speed;
-    public float Jump_force;
+    public float Speed = 10.0f;
+    public float Jump_force = 300.0f;
     public Vector3 oldpos;
     private bool Moving;
     private bool On_ground;
