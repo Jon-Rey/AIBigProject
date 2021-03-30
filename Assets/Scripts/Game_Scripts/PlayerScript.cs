@@ -11,12 +11,14 @@ public class PlayerScript : MonoBehaviour
     public Vector3 oldpos;
     private bool Moving;
     private bool On_ground;
+    private Rigidbody Rigidbody;
 
     // Start is called before the first frame update
     void Start()
     {
         On_ground = true;
         Moving = true;
+        Rigidbody = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -46,7 +48,7 @@ public class PlayerScript : MonoBehaviour
     }
     public void Jump()
     {
-        GetComponent<Rigidbody>().AddForce(0.0f, Jump_force, 0.0f);
+        Rigidbody.AddForce(0.0f, Jump_force, 0.0f);
         On_ground = false;
     }
     public void Set_Jump_force(float jump)
