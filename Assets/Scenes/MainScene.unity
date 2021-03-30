@@ -265,8 +265,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Player: {fileID: 1848702098}
   Spawn: {fileID: 47059120}
-  Speed: 0.04
+  Speed: 10
   Jump_force: 300
+  oldpos: {x: 0, y: 0, z: 0}
 --- !u!1 &897836705
 GameObject:
   m_ObjectHideFlags: 0
