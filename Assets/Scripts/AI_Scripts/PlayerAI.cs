@@ -20,6 +20,7 @@ public class PlayerAI : MonoBehaviour
 
     PlayerScript playerScript;
 
+
     public enum STATE
     {
         DEAD,
@@ -30,7 +31,7 @@ public class PlayerAI : MonoBehaviour
 
     
 
-    public PlayerAI(List<float> _timestojump)
+    public void StartPlayerAI(List<float> _timestojump)
     {
         playerScript = GetComponent<PlayerScript>();
         currState = STATE.INACTIVE;
@@ -41,12 +42,13 @@ public class PlayerAI : MonoBehaviour
         }
 
         curr_jump_time = internalTimer + jump_time_buffer;
+        Debug.Log($"curr_jump_time: {curr_jump_time}");
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -54,6 +56,10 @@ public class PlayerAI : MonoBehaviour
     {
         JumpOnTime();
         internalTimer += Time.deltaTime;
+        if(playerScript.Moving == false)
+        {
+            internalTimer = 0.0f;
+        }
     }
 
     void JumpOnTime()
@@ -80,4 +86,5 @@ public class PlayerAI : MonoBehaviour
             }
         }
     }
+
 }

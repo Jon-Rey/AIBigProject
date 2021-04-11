@@ -9,7 +9,7 @@ public class PlayerScript : MonoBehaviour
     public float Speed = 10.0f;
     public float Jump_force = 300.0f;
     public Vector3 oldpos;
-    private bool Moving;
+    public bool Moving;
     private bool On_ground;
     private Rigidbody Rigidbody;
 
@@ -62,6 +62,11 @@ public class PlayerScript : MonoBehaviour
     }
     void OnCollisionEnter(Collision collision)
     {
+        if (collision.gameObject.tag == "Player")
+        {
+            Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
+        }
+
         if (collision.collider.tag == "Ground" || collision.collider.tag == "Block")
         {
             On_ground = true;
@@ -81,4 +86,6 @@ public class PlayerScript : MonoBehaviour
         Player.SetActive(true);
         Moving = true;
     }
+
+
 }
