@@ -55,4 +55,12 @@ public class ImpossibleAIManager : MonoBehaviour
         }
 
     }
+
+    //TODO: Crossover function
+
+    //TODO: mutation function
+
+    //TODO: fitness function
+
+    //TODO: survival selection
 }
