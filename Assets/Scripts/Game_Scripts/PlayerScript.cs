@@ -61,15 +61,28 @@ public class PlayerScript : MonoBehaviour
     }
     void OnCollisionEnter(Collision collision)
     {
-        
 
-        if (collision.collider.tag == "Ground" || collision.collider.tag == "Block")
+        if (collision.collider.tag == "Ground")
         {
             On_ground = true;
         }
         else if (collision.collider.tag == "Spikey")
         {
-            StartCoroutine(Respawn());
+            StartCoroutine("Respawn");
+        }
+        else if (collision.collider.tag == "Block")
+        {
+            if (collision.contacts.Length > 0)
+            {
+                if (collision.contacts[0].normal.x == 1)
+                {
+                    StartCoroutine("Respawn");
+                }
+                else
+                {
+                    On_ground = true;
+                }
+            }
         }
     }
     IEnumerator Respawn()
@@ -78,7 +91,8 @@ public class PlayerScript : MonoBehaviour
         Moving = false;
         Player.SetActive(false);
         yield return new WaitForSeconds(0.75f);
-        transform.position = Spawn.transform.position;
+        Debug.Log("Respawn");
+        Player.transform.position = Spawn.transform.position;
         Player.SetActive(true);
         Moving = true;
     }
