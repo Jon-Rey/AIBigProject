@@ -19,6 +19,7 @@ public class PlayerScript : MonoBehaviour
         On_ground = true;
         Moving = true;
         Rigidbody = GetComponent<Rigidbody>();
+
     }
 
     // Update is called once per frame
@@ -34,22 +35,20 @@ public class PlayerScript : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                if (Get_On_ground())
-                {
-                    Debug.Log("Jump");
-                    Jump();
-                }
-                else
-                {
-                    Debug.Log("Not able to jump");
-                }
+                
+                Debug.Log("Jump");
+                Jump();
+
             }
         }
     }
     public void Jump()
     {
-        Rigidbody.AddForce(0.0f, Jump_force, 0.0f);
-        On_ground = false;
+        if (Get_On_ground())
+        {
+            Rigidbody.AddForce(0.0f, Jump_force, 0.0f);
+            On_ground = false;
+        }
     }
     public void Set_Jump_force(float jump)
     {
@@ -62,10 +61,7 @@ public class PlayerScript : MonoBehaviour
     }
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == "Player")
-        {
-            Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
-        }
+        
 
         if (collision.collider.tag == "Ground" || collision.collider.tag == "Block")
         {

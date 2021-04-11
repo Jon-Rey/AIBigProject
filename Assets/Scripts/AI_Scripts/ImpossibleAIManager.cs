@@ -21,6 +21,28 @@ public class ImpossibleAIManager : MonoBehaviour
         GeneratePopulation();
     }
 
+    public void Update()
+    {
+        SetCameraOnFarthestChild();
+    }
+
+    public void SetCameraOnFarthestChild()
+    {
+        KeyValuePair<GameObject, PlayerAI> farthest_child = new KeyValuePair<GameObject, PlayerAI>(null, null);
+        foreach (var child in population)
+        {
+            if (farthest_child.Key == null)
+            {
+                farthest_child = child;
+            }
+            else if (Mathf.Abs(child.Key.transform.position.x) > Mathf.Abs(farthest_child.Key.transform.position.x))
+            {
+                farthest_child = child;
+            }
+        }
+        Camera.transform.SetParent(farthest_child.Key.transform);
+    }
+
     public void GeneratePopulation()
     {
         for(int i = 0; i < populationSize; i++)
@@ -32,16 +54,5 @@ public class ImpossibleAIManager : MonoBehaviour
             population[new_player] = playerAI;
         }
 
-        foreach(var child in population)
-        {
-            Collider child_coll1 = child.Key.GetComponent<Collider>();
-            foreach(var child2 in population)
-            {
-                if(child.Key != child2.Key)
-                {
-                    Physics.IgnoreCollision(child_coll1, child2.Key.GetComponent<Collider>());
-                }
-            }
-        }
     }
 }
