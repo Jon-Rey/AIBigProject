@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,11 +6,12 @@ using UnityEngine;
 public class PlayerAI : MonoBehaviour
 {
 
-    public float jump_time_buffer = 1.0f;
+    public float jump_time_buffer = 0.5f;
 
 
     List<float> TrackedJumpTimes;
     Queue<float> JumpQueue;
+    private float MaxDistTraveled = 0f;
 
     float internalTimer = 0;
     float timerBuffer = 0.05f;
@@ -30,11 +32,11 @@ public class PlayerAI : MonoBehaviour
     }
     STATE currState;
 
-    
-
     // Start is called before the first frame update
     void Start()
     {
+        // sign up to listen for player death event
+        playerScript.OnPlayerDeath += HandlePlayerDeath;
         TrackedJumpTimes = new List<float>();
     }
 
@@ -43,19 +45,26 @@ public class PlayerAI : MonoBehaviour
     {
         JumpOnTime();
         internalTimer += Time.deltaTime;
-        
+
         if(playerScript.Moving == false)
         {
             ResetAi();
         }
     }
 
-    public void ResetAi()
+    private void HandlePlayerDeath(float dist)
     {
-        TrackedJumpTimes.Clear();
-        internalTimer = 0.0f;
-        curr_jump_time = initial_jump_time;
+        Debug.Log($"Died with dist traveled={dist}");
+        MaxDistTraveled = dist;
+        currState = STATE.DEAD;
     }
+
+public void ResetAi()
+{
+    TrackedJumpTimes.Clear();
+    internalTimer = 0.0f;
+    curr_jump_time = initial_jump_time;
+}
 
     public void StartPlayerAI(List<float> _timestojump)
     {

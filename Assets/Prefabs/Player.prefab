@@ -178,7 +178,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4f8a5b17707a9d4d96f14be7d5e3bb3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: {fileID: 6575827112448253103}
+  Player: {fileID: 8157715327666433690}
   Spawn: {fileID: 0}
   Speed: 12
   Jump_force: 380

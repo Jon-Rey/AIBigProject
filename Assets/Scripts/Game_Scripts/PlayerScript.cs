@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,9 @@ public class PlayerScript : MonoBehaviour
     public bool Moving;
     private bool On_ground;
     private Rigidbody Rigidbody;
+
+    public delegate void PlayerDiedEvent(float distanceTraveled);
+    public event PlayerDiedEvent OnPlayerDeath;
 
     // Start is called before the first frame update
     void Start()
@@ -42,6 +46,7 @@ public class PlayerScript : MonoBehaviour
             }
         }
     }
+
     public void Jump()
     {
         if (Get_On_ground())
@@ -87,13 +92,16 @@ public class PlayerScript : MonoBehaviour
     }
     IEnumerator Respawn()
     {
-        Debug.Log("Die");
+        if (OnPlayerDeath != null)
+        {
+            float dist = (Player.transform.position - Spawn.transform.position).magnitude;
+            OnPlayerDeath(dist);
+        }
         Moving = false;
-        Player.SetActive(false);
+        // Player.SetActive(false);
         yield return new WaitForSeconds(0.75f);
-        Debug.Log("Respawn");
         Player.transform.position = Spawn.transform.position;
-        Player.SetActive(true);
+        // Player.SetActive(true);
         Moving = true;
     }
 

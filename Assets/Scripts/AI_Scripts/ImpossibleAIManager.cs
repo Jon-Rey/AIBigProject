@@ -11,8 +11,8 @@ public class ImpossibleAIManager : MonoBehaviour
     public GameObject Camera; 
     [HideInInspector]
     public Dictionary<GameObject, PlayerAI> population = new Dictionary<GameObject, PlayerAI>();
-    
 
+    
     /// <summary>
     /// Generate population
     /// </summary>
