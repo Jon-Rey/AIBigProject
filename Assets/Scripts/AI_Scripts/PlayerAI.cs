@@ -6,104 +6,102 @@ using UnityEngine;
 public class PlayerAI : MonoBehaviour
 {
 
-    public float jump_time_buffer = 0.5f;
 
 
-    List<float> TrackedJumpTimes;
-    Queue<float> JumpQueue;
-    private float MaxDistTraveled = 0f;
+    //list of frames is how many frames it takes to run the course
+    List<int> frames;
 
-    float internalTimer = 0;
-    float timerBuffer = 0.05f;
+    public int fitness { get; set; }
 
+    int internalFrameCount = 0;
 
-    
-    float curr_jump_time;
-    float initial_jump_time;
+    int jumpFramCount = 0;
 
     PlayerScript playerScript;
+
+    [HideInInspector]
+    public GameObject PlayerGO { get; private set; }
 
 
     public enum STATE
     {
         DEAD,
         ACTIVE,
-        INACTIVE
+        INACTIVE,
+        TESTRUN
     }
-    STATE currState;
+    public STATE currState;
 
     // Start is called before the first frame update
     void Start()
     {
-        // sign up to listen for player death event
+        playerScript = GetComponent<PlayerScript>();
         playerScript.OnPlayerDeath += HandlePlayerDeath;
-        TrackedJumpTimes = new List<float>();
+        PlayerGO = GetComponent<GameObject>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        JumpOnTime();
-        internalTimer += Time.deltaTime;
+        JumpOnFrame();
+        internalFrameCount += 1;
 
-        if(playerScript.Moving == false)
+
+
+        if(currState == STATE.TESTRUN)
         {
-            ResetAi();
+            if(playerScript.Get_On_ground() == false)
+            {
+                jumpFramCount += 1;
+            }
         }
     }
 
-    private void HandlePlayerDeath(float dist)
+    private void HandlePlayerDeath(int dist)
     {
-        Debug.Log($"Died with dist traveled={dist}");
-        MaxDistTraveled = dist;
+        if(currState == STATE.TESTRUN)
+            Debug.Log($"Died with dist traveled={dist} And JumpFrame Count={jumpFramCount}");
+        else
+            Debug.Log($"Died with dist traveled={dist}");
         currState = STATE.DEAD;
+        ResetAi();
     }
 
-public void ResetAi()
-{
-    TrackedJumpTimes.Clear();
-    internalTimer = 0.0f;
-    curr_jump_time = initial_jump_time;
-}
 
-    public void StartPlayerAI(List<float> _timestojump)
+    private void ResetAi()
     {
-        playerScript = GetComponent<PlayerScript>();
-        currState = STATE.ACTIVE;
-        JumpQueue = new Queue<float>();
-        foreach (float time in JumpQueue)
-        {
-            JumpQueue.Enqueue(time);
-        }
-
-        initial_jump_time = curr_jump_time = internalTimer + jump_time_buffer;
-        Debug.Log($"curr_jump_time: {curr_jump_time}");
+        internalFrameCount = 0;
     }
 
-    void JumpOnTime()
+    public void StartPlayerAI(List<int> _jumpframes)
+    {
+        currState = STATE.ACTIVE;
+        frames = _jumpframes;
+    }
+
+    public void StartPlayerAI_testRun()
+    {
+        currState = STATE.TESTRUN;
+    }
+
+    void JumpOnFrame()
     {
         if (currState == STATE.ACTIVE)
         {
-            if (JumpQueue.Count != 0)
+            if(frames[internalFrameCount] == 1)
             {
-                float jumpTime = JumpQueue.Peek();
-                if (internalTimer >= jumpTime)
-                {
-                    playerScript.Jump();
-                    TrackedJumpTimes.Add(JumpQueue.Dequeue());
-                    curr_jump_time = internalTimer + jump_time_buffer;
-                }
+                playerScript.Jump();
             }
-            else
+        }
+        else if(currState == STATE.TESTRUN)
+        {
+            if(internalFrameCount == 2)
             {
-                if (internalTimer >= curr_jump_time)
-                {
-                    playerScript.Jump();
-                    TrackedJumpTimes.Add(internalTimer);
-                    curr_jump_time = internalTimer + jump_time_buffer;
-                }
+                playerScript.Jump();
             }
         }
     }
 
+
+    
 }

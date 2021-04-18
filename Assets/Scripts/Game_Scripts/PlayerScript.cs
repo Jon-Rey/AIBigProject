@@ -14,9 +14,11 @@ public class PlayerScript : MonoBehaviour
     private bool On_ground;
     private Rigidbody Rigidbody;
 
-    public delegate void PlayerDiedEvent(float distanceTraveled);
+    public delegate void PlayerDiedEvent(int framesTraveled);
     public event PlayerDiedEvent OnPlayerDeath;
 
+
+    int frameCount = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,10 +31,11 @@ public class PlayerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        frameCount += 1;
         if (Moving)
         {
             oldpos = transform.position;
-            transform.position += new Vector3(-Speed * 0.5f*Time.deltaTime, 0.0f, 0.0f);
+            transform.position += new Vector3(Speed * 0.005f, 0.0f, 0.0f);
             if (oldpos == transform.position)
             {
                 StartCoroutine(Respawn());
@@ -64,6 +67,8 @@ public class PlayerScript : MonoBehaviour
     {
         return On_ground;
     }
+
+
     void OnCollisionEnter(Collision collision)
     {
 
@@ -94,8 +99,7 @@ public class PlayerScript : MonoBehaviour
     {
         if (OnPlayerDeath != null)
         {
-            float dist = (Player.transform.position - Spawn.transform.position).magnitude;
-            OnPlayerDeath(dist);
+            OnPlayerDeath(frameCount);
         }
         Moving = false;
         // Player.SetActive(false);

@@ -28,9 +28,9 @@ public class Spike_Generation : MonoBehaviour
         {
             int NumberSpikes = 0;
             //if our spikes z position value goes past the max then we spawn one more spike and then stop spawning them
-            if (SpawnLoc.z > MaxSpawnLocation.z)
+            if (SpawnLoc.x > MaxSpawnLocation.x)
             {
-                SpawnLoc.z = MaxSpawnLocation.z;
+                SpawnLoc.x = MaxSpawnLocation.x;
                 Instantiate(SpikeObject, SpawnLoc, SpikeObject.transform.rotation);
                 break;
             }
@@ -40,10 +40,10 @@ public class Spike_Generation : MonoBehaviour
             if (NumberSpikes == 2)
             {
                 Instantiate(SpikeObject, SpawnLoc, SpikeObject.transform.rotation);//spawn the spike obj at certain location and rotation
-                SpawnLoc.z += 1.0f;
+                SpawnLoc.x += 1.0f;
             }
             Instantiate(SpikeObject, SpawnLoc, SpikeObject.transform.rotation);//spawn the spike obj at certain location and rotation
-            SpawnLoc.z += Random.Range(MinSpacingBetween, MaxSpacingBetween);//offset the next spike location by a random amount
+            SpawnLoc.x += Random.Range(MinSpacingBetween, MaxSpacingBetween);//offset the next spike location by a random amount
         }
     }
 }

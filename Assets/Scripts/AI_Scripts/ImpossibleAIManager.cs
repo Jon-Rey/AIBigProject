@@ -50,7 +50,7 @@ public class ImpossibleAIManager : MonoBehaviour
             GameObject new_player = Instantiate(playerPrefab, SpawnPoint);
             new_player.GetComponent<PlayerScript>().Spawn = SpawnPoint.gameObject;
             PlayerAI playerAI = new_player.GetComponent<PlayerAI>();
-            playerAI.StartPlayerAI(new List<float>());
+            playerAI.StartPlayerAI(new List<int>());
             population[new_player] = playerAI;
         }
 
