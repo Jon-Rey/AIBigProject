@@ -5,11 +5,10 @@ using UnityEngine;
 
 public class PlayerAI : MonoBehaviour
 {
-
-
-
     //list of frames is how many frames it takes to run the course
-    List<int> frames;
+    public List<int> Chromosome { get; private set; }
+    
+    // TODO: make sure the chromosome length is always even. adjust on init if needed.
 
     public int fitness { get; set; }
 
@@ -76,7 +75,7 @@ public class PlayerAI : MonoBehaviour
     public void StartPlayerAI(List<int> _jumpframes)
     {
         currState = STATE.ACTIVE;
-        frames = _jumpframes;
+        Chromosome = _jumpframes;
     }
 
     public void StartPlayerAI_testRun()
@@ -88,7 +87,7 @@ public class PlayerAI : MonoBehaviour
     {
         if (currState == STATE.ACTIVE)
         {
-            if(frames[internalFrameCount] == 1)
+            if(Chromosome[internalFrameCount] == 1)
             {
                 playerScript.Jump();
             }
