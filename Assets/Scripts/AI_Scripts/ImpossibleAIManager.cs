@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class ImpossibleAIManager : MonoBehaviour
 {
@@ -8,59 +10,146 @@ public class ImpossibleAIManager : MonoBehaviour
     public int populationSize = 10;
     public Transform SpawnPoint;
     public GameObject playerPrefab;
-    public GameObject Camera; 
-    [HideInInspector]
-    public Dictionary<GameObject, PlayerAI> population = new Dictionary<GameObject, PlayerAI>();
+    public GameObject Camera;
+    public float MutationRate = 0.01f;
 
+    private bool IsFirstRun = true;     // TODO: implement the 1st run
+    private int Generation;
+    private List<PlayerAI> Population = new List<PlayerAI>();
     
+    private System.Random random;
+
     /// <summary>
     /// Generate population
     /// </summary>
     public void Start()
     {
+        Generation = 1;
+        random = new System.Random();
         GeneratePopulation();
     }
 
+private void GeneratePopulation()
+{
+    if (!IsFirstRun)
+    {
+        for (int i = 0; i < populationSize; i++)
+        {
+            PlayerAI playerAI = MakeNewPlayerAI();
+            playerAI.StartPlayerAI(new List<int>());
+            Population.Add(playerAI);
+        }
+    }
+    else
+    {
+        PlayerAI dummyAI = MakeNewPlayerAI();
+        dummyAI.StartPlayerAI_testRun();
+        IsFirstRun = false;
+        GeneratePopulation();
+        // TODO: store stats of the test run?
+    }
+}
+
+    /// <summary>
+    /// Select the best individuals in the current generation as parents. These will be used to produce offspring. 
+    /// </summary>
+    /// <returns>
+    /// A list of PlayerAI objects (parents) that can be used for reproducing.
+    /// </returns>
+    List<PlayerAI> SelectMatingPool()
+    {
+        var matingPool = new List<PlayerAI>();
+        List<PlayerAI> sortedList = Population.OrderByDescending(p => p.fitness).ToList();
+        // top half of the population gets to reproduce
+        for (int i = 0; i < Mathf.FloorToInt(sortedList.Count / 2.0f); i++)
+        {
+            matingPool.Add(sortedList[i]);
+        }
+        return matingPool;
+    }
+
+    void CalcFitness()
+    {
+        // TODO: calc and assign fitness of all PlayerAI's
+    }
+
+    /// <summary>
+    /// Randomly selects 2 parents from the mating pool, crosses them over using
+    /// Uniform crossover and returns a list of resulting 2 children.
+    /// </summary>
+    /// <returns></returns>
+    List<PlayerAI> Crossover()
+    {
+        var allParents = SelectMatingPool();
+        var children = new List<PlayerAI>()
+        {
+            MakeNewPlayerAI(), MakeNewPlayerAI()
+        };
+
+        // randomly select 2 parents to cross 
+        var idxToRemove = Random.Range(0, allParents.Count);
+        var p1 = allParents[idxToRemove];
+        allParents.RemoveAt(idxToRemove);
+        
+        idxToRemove = Random.Range(0, allParents.Count);
+        var p2 = allParents[idxToRemove];
+        allParents.RemoveAt(idxToRemove);
+
+        foreach (PlayerAI child in children)
+        {
+            for (int i = 0; i < p1.Chromosome.Count; i++)
+            {
+                child.Chromosome[i] = random.NextDouble() < 0.5 ? p1.Chromosome[i] : p2.Chromosome[i];
+            }
+        }
+        return children;
+
+        // Multi-point crossover:
+        // pick cross over points
+        // List<int> crossPonts = new List<int>();
+        // var halfPoint = p1.Chromosome.Count / 2;
+        // var quarterPoint = halfPoint / 2;
+        // crossPonts.Add(quarterPoint);
+        // crossPonts.Add(halfPoint);
+        // crossPonts.Add(halfPoint+quarterPoint);
+    }
+
+    // List<PlayerAI> SwapGenes(PlayerAI parent1, PlayerAI parent2, List<int> swapPoints)
+    // {
+    //     // split each parent chromosomes into quarters
+    // }
+
+    PlayerAI MakeNewPlayerAI()
+    {
+        GameObject new_player = Instantiate(playerPrefab, SpawnPoint);
+        new_player.GetComponent<PlayerScript>().Spawn = SpawnPoint.gameObject;
+        return new_player.GetComponent<PlayerAI>();
+    }
+    
     public void Update()
     {
-        SetCameraOnFarthestChild();
+        // SetCameraOnFarthestChild();
     }
 
-    public void SetCameraOnFarthestChild()
-    {
-        KeyValuePair<GameObject, PlayerAI> farthest_child = new KeyValuePair<GameObject, PlayerAI>(null, null);
-        foreach (var child in population)
-        {
-            if (farthest_child.Key == null)
-            {
-                farthest_child = child;
-            }
-            else if (Mathf.Abs(child.Key.transform.position.x) > Mathf.Abs(farthest_child.Key.transform.position.x))
-            {
-                farthest_child = child;
-            }
-        }
-        Camera.transform.SetParent(farthest_child.Key.transform);
-    }
+    // public void SetCameraOnFarthestChild()
+    // {
+    //     KeyValuePair<GameObject, PlayerAI> farthest_child = new KeyValuePair<GameObject, PlayerAI>(null, null);
+    //     foreach (var child in population)
+    //     {
+    //         if (farthest_child.Key == null)
+    //         {
+    //             farthest_child = child;
+    //         }
+    //         else if (Mathf.Abs(child.Key.transform.position.x) > Mathf.Abs(farthest_child.Key.transform.position.x))
+    //         {
+    //             farthest_child = child;
+    //         }
+    //     }
+    //     Camera.transform.SetParent(farthest_child.Key.transform);
+    // }
 
-    public void GeneratePopulation()
-    {
-        for(int i = 0; i < populationSize; i++)
-        {
-            GameObject new_player = Instantiate(playerPrefab, SpawnPoint);
-            new_player.GetComponent<PlayerScript>().Spawn = SpawnPoint.gameObject;
-            PlayerAI playerAI = new_player.GetComponent<PlayerAI>();
-            playerAI.StartPlayerAI(new List<int>());
-            population[new_player] = playerAI;
-        }
-
-    }
-
-    //TODO: Crossover function
-
+    
     //TODO: mutation function
-
     //TODO: fitness function
-
     //TODO: survival selection
 }
