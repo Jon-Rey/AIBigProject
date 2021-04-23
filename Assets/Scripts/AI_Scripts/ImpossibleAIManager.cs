@@ -150,6 +150,35 @@ private void GeneratePopulation()
 
     
     //TODO: mutation function
+    public List<int> Mutation(List<int> gene, int jumpFrames)
+    {
+        List<int> copygene = gene;
+        List<int> changes = new List<int>();
+        int randinter = Random.Range(0,gene.Count);//gets amount of elements in the list we are changing
+        int i = 0;
+        while (i < randinter)
+        {
+            int change = Random.Range(0,gene.Count-1);
+            if (!changes.Contains(change))
+            {
+                changes.Add(change);
+                i += 1;
+            }
+        }
+        foreach(int c in changes)
+        {
+            if (copygene[c] == 0)
+            {
+                copygene[c] = 1;
+            }
+            else
+            {
+                copygene[c] = 0;
+            }
+        }
+        return copygene;
+    }
+
     //TODO: fitness function
     //TODO: survival selection
 }
