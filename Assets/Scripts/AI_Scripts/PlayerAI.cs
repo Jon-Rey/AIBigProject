@@ -16,6 +16,8 @@ public class PlayerAI : MonoBehaviour
 
     int jumpFramCount = 0;
 
+    private bool isTestRun = true;
+
     PlayerScript playerScript;
 
     [HideInInspector]
@@ -27,7 +29,6 @@ public class PlayerAI : MonoBehaviour
         DEAD,
         ACTIVE,
         INACTIVE,
-        TESTRUN,
         FINISH
     }
     public STATE currState;
@@ -45,7 +46,15 @@ public class PlayerAI : MonoBehaviour
     {
         JumpOnFrame();
         internalFrameCount += 1;
-        if(currState == STATE.TESTRUN)
+        
+        if (currState == STATE.FINISH)
+            Debug.Log("Yay, you win!");
+        
+        if(!isTestRun)
+        {
+            
+        }
+        else
         {
             if(playerScript.Get_On_ground() == false)
             {
@@ -56,7 +65,7 @@ public class PlayerAI : MonoBehaviour
 
     private void HandlePlayerDeath(int dist)
     {
-        if(currState == STATE.TESTRUN)
+        if(isTestRun)
             Debug.Log($"Died with dist traveled={dist} And JumpFrame Count={jumpFramCount}");
         else
             Debug.Log($"Died with dist traveled={dist}");
@@ -72,6 +81,7 @@ public class PlayerAI : MonoBehaviour
 
     public void StartPlayerAI(List<int> _jumpframes)
     {
+        isTestRun = false;
         currState = STATE.ACTIVE;
         Chromosome = _jumpframes;
         Physics.IgnoreLayerCollision(6, 8, false);
@@ -79,7 +89,7 @@ public class PlayerAI : MonoBehaviour
 
     public void StartPlayerAI_testRun()
     {
-        currState = STATE.TESTRUN;
+        isTestRun = true;
         Physics.IgnoreLayerCollision(6, 8, true);
     }
 
@@ -93,7 +103,7 @@ public class PlayerAI : MonoBehaviour
                 playerScript.Jump();
             }
         }
-        else if(currState == STATE.TESTRUN)
+        else if(isTestRun)
         {
             if(internalFrameCount == 2)
             {

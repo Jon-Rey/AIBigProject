@@ -13,19 +13,25 @@ public class PlayerScript : MonoBehaviour
     public bool Moving;
     private bool On_ground;
     private Rigidbody Rigidbody;
+    private PlayerAI PlayerAIScript;
 
     public delegate void PlayerDiedEvent(int framesTraveled);
     public event PlayerDiedEvent OnPlayerDeath;
 
-
     int frameCount = 0;
+
+
+    void Awake()
+    {
+        PlayerAIScript = Player.GetComponent<PlayerAI>();
+        Rigidbody = GetComponent<Rigidbody>();
+    }
+    
     // Start is called before the first frame update
     void Start()
     {
         On_ground = true;
         Moving = true;
-        Rigidbody = GetComponent<Rigidbody>();
-
     }
 
     // Update is called once per frame
@@ -80,19 +86,10 @@ public class PlayerScript : MonoBehaviour
         {
             StartCoroutine("Respawn");
         }
-        else if (collision.collider.tag == "Block")
+        else if (collision.collider.tag == "Finish")
         {
-            if (collision.contacts.Length > 0)
-            {
-                if (collision.contacts[0].normal.x == 1)
-                {
-                    StartCoroutine("Respawn");
-                }
-                else
-                {
-                    On_ground = true;
-                }
-            }
+            PlayerAIScript.currState = PlayerAI.STATE.FINISH;
+            Debug.Log("pls work");
         }
     }
     IEnumerator Respawn()
