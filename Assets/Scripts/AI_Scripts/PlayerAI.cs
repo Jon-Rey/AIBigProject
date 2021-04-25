@@ -85,8 +85,11 @@ public class PlayerAI : MonoBehaviour
 
     void JumpOnFrame()
     {
+        
+
         if (currState == STATE.ACTIVE)
         {
+            
             if(Chromosome[internalFrameCount] == 1)
             {
                 playerScript.Jump();
