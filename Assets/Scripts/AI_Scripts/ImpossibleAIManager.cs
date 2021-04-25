@@ -131,22 +131,22 @@ private void GeneratePopulation()
         // SetCameraOnFarthestChild();
     }
 
-    // public void SetCameraOnFarthestChild()
-    // {
-    //     KeyValuePair<GameObject, PlayerAI> farthest_child = new KeyValuePair<GameObject, PlayerAI>(null, null);
-    //     foreach (var child in population)
-    //     {
-    //         if (farthest_child.Key == null)
-    //         {
-    //             farthest_child = child;
-    //         }
-    //         else if (Mathf.Abs(child.Key.transform.position.x) > Mathf.Abs(farthest_child.Key.transform.position.x))
-    //         {
-    //             farthest_child = child;
-    //         }
-    //     }
-    //     Camera.transform.SetParent(farthest_child.Key.transform);
-    // }
+    public void SetCameraOnFarthestChild()
+    {
+        PlayerAI farthest_child = null;
+        foreach (var child in Population)
+        {
+            if (farthest_child == null)
+            {
+                farthest_child = child;
+            }
+            else if (Mathf.Abs(child.transform.position.x) > Mathf.Abs(farthest_child.transform.position.x))
+            {
+                farthest_child = child;
+            }
+        }
+        Camera.transform.SetParent(farthest_child.transform);
+    }
 
     
     //TODO: mutation function
