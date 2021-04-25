@@ -19,6 +19,8 @@ public class ImpossibleAIManager : MonoBehaviour
     
     private System.Random random;
 
+    private PlayerAI solutionChild = null;
+
     /// <summary>
     /// Generate population
     /// </summary>
@@ -129,6 +131,35 @@ private void GeneratePopulation()
     public void Update()
     {
         // SetCameraOnFarthestChild();
+        CheckChildrenState();
+    }
+
+    public void CheckChildrenState()
+    {
+        int dead = 0;
+        foreach(var child in Population)
+        {
+            if(child.currState == PlayerAI.STATE.DEAD)
+            {
+                dead += 1;
+            }
+            else if (child.currState == PlayerAI.STATE.FINISH)
+            {
+                solutionChild = child;
+                break;
+            }
+        }
+        if (solutionChild == null)
+        {
+            if (dead == populationSize - 1)
+            {
+                //Survival selection!
+            }
+        }
+        else
+        {
+            //solution achieved, stop simulation and print out successful child or let successful child continue running the course alone till done. 
+        }
     }
 
     public void SetCameraOnFarthestChild()

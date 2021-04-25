@@ -27,7 +27,8 @@ public class PlayerAI : MonoBehaviour
         DEAD,
         ACTIVE,
         INACTIVE,
-        TESTRUN
+        TESTRUN,
+        FINISH
     }
     public STATE currState;
 
