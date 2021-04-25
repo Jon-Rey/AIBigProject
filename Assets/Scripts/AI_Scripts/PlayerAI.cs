@@ -45,9 +45,6 @@ public class PlayerAI : MonoBehaviour
     {
         JumpOnFrame();
         internalFrameCount += 1;
-
-
-
         if(currState == STATE.TESTRUN)
         {
             if(playerScript.Get_On_ground() == false)
@@ -77,17 +74,17 @@ public class PlayerAI : MonoBehaviour
     {
         currState = STATE.ACTIVE;
         Chromosome = _jumpframes;
+        Physics.IgnoreLayerCollision(6, 8, false);
     }
 
     public void StartPlayerAI_testRun()
     {
         currState = STATE.TESTRUN;
+        Physics.IgnoreLayerCollision(6, 8, true);
     }
 
     void JumpOnFrame()
     {
-        
-
         if (currState == STATE.ACTIVE)
         {
             
@@ -104,7 +101,4 @@ public class PlayerAI : MonoBehaviour
             }
         }
     }
-
-
-    
 }

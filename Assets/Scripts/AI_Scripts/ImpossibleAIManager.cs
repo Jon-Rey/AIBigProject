@@ -14,6 +14,7 @@ public class ImpossibleAIManager : MonoBehaviour
     public float MutationRate = 0.01f;
 
     private bool IsFirstRun = true;     // TODO: implement the 1st run
+    [SerializeField]
     private int Generation;
     private List<PlayerAI> Population = new List<PlayerAI>();
     
@@ -47,7 +48,7 @@ private void GeneratePopulation()
         PlayerAI dummyAI = MakeNewPlayerAI();
         dummyAI.StartPlayerAI_testRun();
         IsFirstRun = false;
-        GeneratePopulation();
+        // GeneratePopulation();
         // TODO: store stats of the test run?
     }
 }
