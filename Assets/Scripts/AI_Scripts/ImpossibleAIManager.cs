@@ -131,7 +131,8 @@ private void GeneratePopulation()
     public void Update()
     {
         // SetCameraOnFarthestChild();
-        CheckChildrenState();
+        if(solutionChild == null)
+            CheckChildrenState();
     }
 
     public void CheckChildrenState()
