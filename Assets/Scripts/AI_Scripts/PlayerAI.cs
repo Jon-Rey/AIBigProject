@@ -7,12 +7,13 @@ public class PlayerAI : MonoBehaviour
 {
     //list of frames is how many frames it takes to run the course
     public List<int> Chromosome { get; private set; }
-    
+
     // TODO: make sure the chromosome length is always even. adjust on init if needed.
 
-    public int fitness { get; set; }
+    public float fitness { get; set; }
 
-    int internalFrameCount = 0;
+    [HideInInspector]
+    public int internalFrameCount = 0;
 
     int jumpFramCount = 0;
 
@@ -111,4 +112,5 @@ public class PlayerAI : MonoBehaviour
             }
         }
     }
+
 }

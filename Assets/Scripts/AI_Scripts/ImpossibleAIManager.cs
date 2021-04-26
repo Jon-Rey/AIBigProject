@@ -71,9 +71,15 @@ private void GeneratePopulation()
         return matingPool;
     }
 
-    void CalcFitness()
+
+    public float Fitness(PlayerAI child)
     {
-        // TODO: calc and assign fitness of all PlayerAI's
+        float return_fit = 0;
+
+        //one distance factor playing into the solution
+        return_fit += child.internalFrameCount / solutionChild.internalFrameCount;
+
+        return return_fit;
     }
 
     /// <summary>
