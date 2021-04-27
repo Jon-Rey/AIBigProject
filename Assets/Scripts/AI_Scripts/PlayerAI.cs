@@ -16,6 +16,8 @@ public class PlayerAI : MonoBehaviour
     [FormerlySerializedAs("internalFrameCount")] [HideInInspector]
     public int ChromosomeLength = 0;
 
+    private int CurrentChromosomeIndex = 0;
+
     int jumpFramCount = 0;
 
     private bool isTestRun = true;
@@ -46,10 +48,14 @@ public class PlayerAI : MonoBehaviour
     void Update()
     {
         JumpOnFrame();
-        ChromosomeLength += 1;
-        
+        CurrentChromosomeIndex += 1;
+
         if (currState == STATE.FINISH)
+        {
             Debug.Log("Yay, you win!");
+            if (isTestRun)
+                ChromosomeLength = CurrentChromosomeIndex;
+        }
         
         if(!isTestRun)
         {
@@ -78,6 +84,7 @@ public class PlayerAI : MonoBehaviour
     private void ResetAi()
     {
         ChromosomeLength = 0;
+        CurrentChromosomeIndex = 0;
     }
 
     public void StartPlayerAI(List<int> chromosome)
@@ -97,16 +104,16 @@ public class PlayerAI : MonoBehaviour
 
     void JumpOnFrame()
     {
-        if (currState == STATE.ACTIVE)
+        if (!isTestRun && currState == STATE.ACTIVE)
         {
-            if(Chromosome[ChromosomeLength] == 1)
+            if(Chromosome[CurrentChromosomeIndex] == 1)
             {
                 playerScript.Jump();
             }
         }
         else if(isTestRun)
         {
-            if(ChromosomeLength == 2)
+            if(CurrentChromosomeIndex == 2)
             {
                 playerScript.Jump();
             }
