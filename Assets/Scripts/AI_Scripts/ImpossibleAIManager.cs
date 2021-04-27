@@ -36,6 +36,8 @@ public class ImpossibleAIManager : MonoBehaviour
     {
         if (!IsFirstRun)
         {
+            BestSoFar.ChromosomeLength = BestSoFar.CurrentChromosomeIndex;
+            Debug.Log($"Chromosome Length={BestSoFar.ChromosomeLength}");
             for (int i = 0; i < populationSize; i++)
             {
                 // make a new player ai with a randomized chromosome

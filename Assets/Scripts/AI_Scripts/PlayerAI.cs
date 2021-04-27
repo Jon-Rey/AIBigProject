@@ -16,7 +16,8 @@ public class PlayerAI : MonoBehaviour
     [FormerlySerializedAs("internalFrameCount")] [HideInInspector]
     public int ChromosomeLength = 0;
 
-    private int CurrentChromosomeIndex = 0;
+    [HideInInspector]
+    public int CurrentChromosomeIndex = 0;
 
     int jumpFramCount = 0;
 
@@ -53,8 +54,6 @@ public class PlayerAI : MonoBehaviour
         if (currState == STATE.FINISH)
         {
             Debug.Log("Yay, you win!");
-            if (isTestRun)
-                ChromosomeLength = CurrentChromosomeIndex;
         }
         
         if(!isTestRun)
@@ -72,10 +71,10 @@ public class PlayerAI : MonoBehaviour
 
     private void HandlePlayerDeath(int dist)
     {
-        if(isTestRun)
-            Debug.Log($"Died with dist traveled={dist} And JumpFrame Count={jumpFramCount}");
-        else
-            Debug.Log($"Died with dist traveled={dist}");
+        // if(isTestRun)
+        //     Debug.Log($"Died with dist traveled={dist} And JumpFrame Count={jumpFramCount}");
+        // else
+        //     Debug.Log($"Died with dist traveled={dist}");
         currState = STATE.DEAD;
         ResetAi();
     }
@@ -83,7 +82,6 @@ public class PlayerAI : MonoBehaviour
 
     private void ResetAi()
     {
-        ChromosomeLength = 0;
         CurrentChromosomeIndex = 0;
     }
 

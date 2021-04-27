@@ -84,12 +84,11 @@ public class PlayerScript : MonoBehaviour
         }
         else if (collision.collider.tag == "Spikey")
         {
-            StartCoroutine("Respawn");
+            PlayerAIScript.currState = PlayerAI.STATE.DEAD;
         }
         else if (collision.collider.tag == "Finish")
         {
             PlayerAIScript.currState = PlayerAI.STATE.FINISH;
-            Debug.Log("pls work");
         }
     }
     IEnumerator Respawn()
