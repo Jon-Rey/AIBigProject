@@ -84,7 +84,10 @@ public class PlayerScript : MonoBehaviour
         }
         else if (collision.collider.tag == "Spikey")
         {
-            PlayerAIScript.currState = PlayerAI.STATE.DEAD;
+            if (OnPlayerDeath != null)
+            {
+                OnPlayerDeath(frameCount);
+            }
         }
         else if (collision.collider.tag == "Finish")
         {

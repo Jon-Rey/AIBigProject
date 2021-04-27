@@ -49,8 +49,10 @@ public class PlayerAI : MonoBehaviour
     void Update()
     {
         JumpOnFrame();
-        CurrentChromosomeIndex += 1;
-
+        if (playerScript.Moving)
+        {
+            CurrentChromosomeIndex += 1;
+        }
         if (currState == STATE.FINISH)
         {
             Debug.Log("Yay, you win!");
@@ -77,6 +79,7 @@ public class PlayerAI : MonoBehaviour
         //     Debug.Log($"Died with dist traveled={dist}");
         currState = STATE.DEAD;
         ResetAi();
+        playerScript.Moving = false;
     }
 
 
