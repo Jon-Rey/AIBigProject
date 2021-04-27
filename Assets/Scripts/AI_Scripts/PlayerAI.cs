@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PlayerAI : MonoBehaviour
 {
@@ -12,8 +13,8 @@ public class PlayerAI : MonoBehaviour
 
     public float fitness { get; set; }
 
-    [HideInInspector]
-    public int internalFrameCount = 0;
+    [FormerlySerializedAs("internalFrameCount")] [HideInInspector]
+    public int ChromosomeLength = 0;
 
     int jumpFramCount = 0;
 
@@ -23,7 +24,6 @@ public class PlayerAI : MonoBehaviour
 
     [HideInInspector]
     public GameObject PlayerGO { get; private set; }
-
 
     public enum STATE
     {
@@ -46,7 +46,7 @@ public class PlayerAI : MonoBehaviour
     void Update()
     {
         JumpOnFrame();
-        internalFrameCount += 1;
+        ChromosomeLength += 1;
         
         if (currState == STATE.FINISH)
             Debug.Log("Yay, you win!");
@@ -77,20 +77,21 @@ public class PlayerAI : MonoBehaviour
 
     private void ResetAi()
     {
-        internalFrameCount = 0;
+        ChromosomeLength = 0;
     }
 
-    public void StartPlayerAI(List<int> _jumpframes)
+    public void StartPlayerAI(List<int> chromosome)
     {
         isTestRun = false;
         currState = STATE.ACTIVE;
-        Chromosome = _jumpframes;
+        Chromosome = chromosome;
         Physics.IgnoreLayerCollision(6, 8, false);
     }
 
     public void StartPlayerAI_testRun()
     {
         isTestRun = true;
+        // ignore spikes
         Physics.IgnoreLayerCollision(6, 8, true);
     }
 
@@ -98,19 +99,17 @@ public class PlayerAI : MonoBehaviour
     {
         if (currState == STATE.ACTIVE)
         {
-            
-            if(Chromosome[internalFrameCount] == 1)
+            if(Chromosome[ChromosomeLength] == 1)
             {
                 playerScript.Jump();
             }
         }
         else if(isTestRun)
         {
-            if(internalFrameCount == 2)
+            if(ChromosomeLength == 2)
             {
                 playerScript.Jump();
             }
         }
     }
-
 }

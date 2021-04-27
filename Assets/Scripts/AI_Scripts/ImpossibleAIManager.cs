@@ -20,7 +20,7 @@ public class ImpossibleAIManager : MonoBehaviour
     
     private System.Random random;
 
-    private PlayerAI solutionChild = null;
+    private PlayerAI BestSoFar = null;
 
     /// <summary>
     /// Generate population
@@ -32,26 +32,30 @@ public class ImpossibleAIManager : MonoBehaviour
         GeneratePopulation();
     }
 
-private void GeneratePopulation()
-{
-    if (!IsFirstRun)
+    private void GeneratePopulation()
     {
-        for (int i = 0; i < populationSize; i++)
+        if (!IsFirstRun)
         {
-            PlayerAI playerAI = MakeNewPlayerAI();
-            playerAI.StartPlayerAI(new List<int>());
-            Population.Add(playerAI);
+            for (int i = 0; i < populationSize; i++)
+            {
+                // make a new player ai with a randomized chromosome
+                var randomChromosome = new List<int>(BestSoFar.ChromosomeLength);
+                for (int j = 0; j < BestSoFar.ChromosomeLength; j++)
+                {
+                    randomChromosome.Add(random.NextDouble() < 0.5 ? 0 : 1); 
+                }
+                
+                PlayerAI playerAI = MakeNewPlayerAI();
+                playerAI.StartPlayerAI(randomChromosome);
+                Population.Add(playerAI);
+            }
+        }
+        else
+        {
+            BestSoFar = MakeNewPlayerAI();
+            BestSoFar.StartPlayerAI_testRun();
         }
     }
-    else
-    {
-        PlayerAI dummyAI = MakeNewPlayerAI();
-        dummyAI.StartPlayerAI_testRun();
-        IsFirstRun = false;
-        // GeneratePopulation();
-        // TODO: store stats of the test run?
-    }
-}
 
     /// <summary>
     /// Select the best individuals in the current generation as parents. These will be used to produce offspring. 
@@ -77,7 +81,7 @@ private void GeneratePopulation()
         float return_fit = 0;
 
         //one distance factor playing into the solution
-        return_fit += child.internalFrameCount / solutionChild.internalFrameCount;
+        return_fit += child.ChromosomeLength / BestSoFar.ChromosomeLength;
 
         return return_fit;
     }
@@ -112,21 +116,7 @@ private void GeneratePopulation()
             }
         }
         return children;
-
-        // Multi-point crossover:
-        // pick cross over points
-        // List<int> crossPonts = new List<int>();
-        // var halfPoint = p1.Chromosome.Count / 2;
-        // var quarterPoint = halfPoint / 2;
-        // crossPonts.Add(quarterPoint);
-        // crossPonts.Add(halfPoint);
-        // crossPonts.Add(halfPoint+quarterPoint);
     }
-
-    // List<PlayerAI> SwapGenes(PlayerAI parent1, PlayerAI parent2, List<int> swapPoints)
-    // {
-    //     // split each parent chromosomes into quarters
-    // }
 
     PlayerAI MakeNewPlayerAI()
     {
@@ -138,12 +128,21 @@ private void GeneratePopulation()
     public void Update()
     {
         // SetCameraOnFarthestChild();
-        if(solutionChild == null)
-            CheckChildrenState();
+        CheckChildrenState();
     }
 
-    public void CheckChildrenState()
+    void CheckChildrenState()
     {
+        if (IsFirstRun && BestSoFar)
+        {
+            if (BestSoFar.currState == PlayerAI.STATE.FINISH)
+            {
+                IsFirstRun = false;
+                BestSoFar.gameObject.SetActive(false);
+                GeneratePopulation();
+            }
+        }
+        
         int dead = 0;
         foreach(var child in Population)
         {
@@ -153,11 +152,11 @@ private void GeneratePopulation()
             }
             else if (child.currState == PlayerAI.STATE.FINISH)
             {
-                solutionChild = child;
+                BestSoFar = child;
                 break;
             }
         }
-        if (solutionChild == null)
+        if (BestSoFar == null)
         {
             if (dead == populationSize - 1)
             {
