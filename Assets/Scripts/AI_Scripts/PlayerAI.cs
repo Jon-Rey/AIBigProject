@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 public class PlayerAI : MonoBehaviour
 {
     //list of frames is how many frames it takes to run the course
-    public List<int> Chromosome { get; private set; }
+    public List<int> Chromosome { get; set; }
 
     // TODO: make sure the chromosome length is always even. adjust on init if needed.
 
@@ -38,7 +38,7 @@ public class PlayerAI : MonoBehaviour
     public STATE currState;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         playerScript = GetComponent<PlayerScript>();
         playerScript.OnPlayerDeath += HandlePlayerDeath;
@@ -88,17 +88,18 @@ public class PlayerAI : MonoBehaviour
         CurrentChromosomeIndex = 0;
     }
 
-    public void StartPlayerAI(List<int> chromosome)
+    public void StartPlayerAI()
     {
         isTestRun = false;
         currState = STATE.ACTIVE;
-        Chromosome = chromosome;
+        playerScript.Moving = true;
         Physics.IgnoreLayerCollision(6, 8, false);
     }
 
     public void StartPlayerAI_testRun()
     {
         isTestRun = true;
+        playerScript.Moving = true;
         // ignore spikes
         Physics.IgnoreLayerCollision(6, 8, true);
     }

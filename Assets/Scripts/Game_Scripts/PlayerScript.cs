@@ -10,7 +10,7 @@ public class PlayerScript : MonoBehaviour
     public float Speed = 10.0f;
     public float Jump_force = 300.0f;
     public Vector3 oldpos;
-    public bool Moving;
+    public bool Moving = false;
     private bool On_ground;
     private Rigidbody Rigidbody;
     private PlayerAI PlayerAIScript;
@@ -31,7 +31,6 @@ public class PlayerScript : MonoBehaviour
     void Start()
     {
         On_ground = true;
-        Moving = true;
     }
 
     // Update is called once per frame
@@ -105,7 +104,7 @@ public class PlayerScript : MonoBehaviour
         yield return new WaitForSeconds(0.75f);
         Player.transform.position = Spawn.transform.position;
         // Player.SetActive(true);
-        Moving = true;
+        // Moving = true;
     }
 
 
