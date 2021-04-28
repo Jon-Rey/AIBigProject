@@ -86,7 +86,7 @@ public class PlayerAI : MonoBehaviour
     private void ResetAi()
     {
         CurrentChromosomeIndex = 0;
-        currState = STATE.INACTIVE;
+
     }
 
     public void StartPlayerAI()

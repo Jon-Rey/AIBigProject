@@ -139,9 +139,28 @@ public class ImpossibleAIManager : MonoBehaviour
         {
             if (BestSoFar.currState == PlayerAI.STATE.FINISH)
             {
-                IsFirstRun = false;
-                BestSoFar.gameObject.SetActive(false);
-                GeneratePopulation();
+                switch (child.currState)
+                {
+                    case PlayerAI.STATE.DEAD:
+                        AllChildrenDead = true;
+                        break;
+                    case PlayerAI.STATE.ACTIVE:
+                        AllChildrenDead = false;
+                        break;
+                    case PlayerAI.STATE.INACTIVE:
+                        AllChildrenDead = false;
+                        break;
+                    case PlayerAI.STATE.FINISH:
+                        AllChildrenDead = false;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                Debug.Log(child.currState);
+                if (AllChildrenDead == false)
+                {
+                    break;
+                }
             }
         }
         
@@ -167,7 +186,11 @@ public class ImpossibleAIManager : MonoBehaviour
         }
         else
         {
-            //solution achieved, stop simulation and print out successful child or let successful child continue running the course alone till done. 
+            if (BestSoFar.currState != PlayerAI.STATE.FINISH) return;
+            IsFirstRun = false;
+            BestSoFar.gameObject.SetActive(false);
+            Debug.Log("gen pop");
+            GeneratePopulation();
         }
     }
 
@@ -185,7 +208,13 @@ public class ImpossibleAIManager : MonoBehaviour
                 farthest_child = child;
             }
         }
-        Camera.transform.SetParent(farthest_child.transform);
+
+        foreach(var child in tempChildren)
+        {
+            Population.Add(child);
+        }
+        AllChildrenDead = false;
+        Debug.Log("survival selected");
     }
 
     
