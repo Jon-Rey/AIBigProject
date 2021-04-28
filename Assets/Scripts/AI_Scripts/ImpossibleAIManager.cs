@@ -187,14 +187,26 @@ public class ImpossibleAIManager : MonoBehaviour
         {
             foreach (var child in Population)
             {
-                if(child.currState == PlayerAI.STATE.ACTIVE)
+                switch (child.currState)
                 {
-                    AllChildrenDead = false;
-                    break;
+                    case PlayerAI.STATE.DEAD:
+                        AllChildrenDead = true;
+                        break;
+                    case PlayerAI.STATE.ACTIVE:
+                        AllChildrenDead = false;
+                        break;
+                    case PlayerAI.STATE.INACTIVE:
+                        AllChildrenDead = false;
+                        break;
+                    case PlayerAI.STATE.FINISH:
+                        AllChildrenDead = false;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
-                else
+                if (AllChildrenDead == false)
                 {
-                    AllChildrenDead = true;
+                    break;
                 }
             }
             
@@ -214,6 +226,7 @@ public class ImpossibleAIManager : MonoBehaviour
             IsFirstRun = false;
             BestSoFar.gameObject.SetActive(false);
             Debug.Log("gen pop");
+            AllChildrenDead = false;
             GeneratePopulation();
         }
     }
