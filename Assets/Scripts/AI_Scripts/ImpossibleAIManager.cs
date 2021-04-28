@@ -238,6 +238,7 @@ public class ImpossibleAIManager : MonoBehaviour
         SortedPopulation.RemoveRange(quarterPop * 3, quarterPop);
         Population = SortedPopulation;
 
+        List<PlayerAI> tempChildren = new List<PlayerAI>();
         // select parents from the remaining pool and make n children
         for (int i = 0; i < quarterPop / 2; i++)
         {
@@ -254,8 +255,13 @@ public class ImpossibleAIManager : MonoBehaviour
                 child.fitness = Fitness(child);
                         
                 // removed children get replaced with the new children
-                Population.Add(child);
+                tempChildren.Add(child);
             }
+        }
+
+        foreach(var child in tempChildren)
+        {
+            Population.Add(child);
         }
         Debug.Log("survival selected");
     }
