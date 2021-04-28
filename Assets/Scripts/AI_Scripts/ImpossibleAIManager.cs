@@ -1,29 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
 
 public class ImpossibleAIManager : MonoBehaviour
 {
-
-    public int populationSize = 10;
-    public Transform SpawnPoint;
-    public GameObject playerPrefab;
-    public GameObject Camera;
-    public float MutationRate = 0.1f;
-
-    private bool IsFirstRun = true;     // TODO: implement the 1st run
-    [SerializeField]
-    private int Generation;
-    private List<PlayerAI> Population = new List<PlayerAI>();
-    private bool AllChildrenDead = false;
-    private System.Random random;
-
-    private PlayerAI BestSoFar = null;
-
     public enum GAMESTATE
     {
         SETUP,
@@ -32,6 +14,18 @@ public class ImpossibleAIManager : MonoBehaviour
         EVOLVING
     }
     public GAMESTATE GameState = GAMESTATE.FIRSTRUN;
+    
+    public int populationSize = 10;
+    public Transform SpawnPoint;
+    public GameObject playerPrefab;
+    public float MutationRate = 0.1f;
+    public int Generation { get; private set; }
+    
+    private List<PlayerAI> Population = new List<PlayerAI>();
+    private bool AllChildrenDead = false;
+    private PlayerAI BestSoFar = null;
+    private System.Random random;
+
 
     /// <summary>
     /// Generate population
@@ -42,7 +36,6 @@ public class ImpossibleAIManager : MonoBehaviour
         random = new System.Random();
         DoTestRun();
     }
-
 
     public void Update()
     {
@@ -93,8 +86,7 @@ public class ImpossibleAIManager : MonoBehaviour
                 break;
             }
         }
-
-
+        
         if (AllChildrenDead)
         {
             Debug.Log("all dead");
@@ -265,27 +257,26 @@ public class ImpossibleAIManager : MonoBehaviour
     PlayerAI[] Crossover(PlayerAI[] parents)
     {
         if (parents.Length != 2)
-            throw new IndexOutOfRangeException("Need 2 parents to make them babies ;)");
+            throw new IndexOutOfRangeException("Need 2 parents to make new babies ;)");
 
-        var children = new PlayerAI[2]
-        {
-            MakeNewPlayerAI(), MakeNewPlayerAI()
-        };
-
+        var children = new PlayerAI[2];
+        List<int> tempChromo = new List<int>(parents[0].ChromosomeLength);
         for (int i = 0; i < children.Length; i++)
         {
-            for (int j = 0; j < children[i].Chromosome.Count; j++)
+            tempChromo.Clear();
+            for (int j = 0; j < tempChromo.Count; j++)
             {
-                children[i].Chromosome[j] =
+                tempChromo[j] = 
                     random.NextDouble() < 0.5 ? parents[0].Chromosome[i] : parents[1].Chromosome[i];
             }
+            // TODO: need to instantiate the children to be able to do anything like this. 
+            // children[i].Chromosome = new List<int>(tempChromo);
         }
         return children;
     }
 
-    List<int> RandChromo()
+    private List<int> RandChromo()
     {
-        // make a new player ai with a randomized chromosome
         var randomChromosome = new List<int>(BestSoFar.ChromosomeLength);
         for (int j = 0; j < BestSoFar.ChromosomeLength; j++)
         {

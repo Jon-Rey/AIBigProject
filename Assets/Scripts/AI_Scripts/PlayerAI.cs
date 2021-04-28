@@ -25,9 +25,6 @@ public class PlayerAI : MonoBehaviour
 
     PlayerScript playerScript;
 
-    [HideInInspector]
-    public GameObject PlayerGO { get; private set; }
-
     public enum STATE
     {
         DEAD,
@@ -42,7 +39,6 @@ public class PlayerAI : MonoBehaviour
     {
         playerScript = GetComponent<PlayerScript>();
         playerScript.OnPlayerDeath += HandlePlayerDeath;
-        PlayerGO = GetComponent<GameObject>();
     }
 
     // Update is called once per frame
@@ -71,7 +67,7 @@ public class PlayerAI : MonoBehaviour
         }
     }
 
-    private void HandlePlayerDeath(int dist)
+    private void HandlePlayerDeath(int currentFrame)
     {
         CurrentChromosomeIndex = 0;
         currState = STATE.DEAD;

@@ -38,6 +38,7 @@ public class PlayerScript : MonoBehaviour
     {
         if (!Moving) return;
         
+        frameCount += 1;
         oldpos = transform.position;
         transform.position += new Vector3(Speed * 0.005f, 0.0f, 0.0f);
     }
