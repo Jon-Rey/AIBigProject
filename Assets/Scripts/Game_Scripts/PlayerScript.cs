@@ -81,7 +81,7 @@ public class PlayerScript : MonoBehaviour
         }
     }
     
-    IEnumerator Respawn()
+    void Respawn()
     {
         if (OnPlayerDeath != null)
         {
@@ -89,7 +89,6 @@ public class PlayerScript : MonoBehaviour
         }
         Moving = false;
         // Player.SetActive(false);
-        yield return new WaitForSeconds(0.75f);
         Player.transform.position = Spawn.transform.position;
         // Player.SetActive(true);
         // Moving = true;
