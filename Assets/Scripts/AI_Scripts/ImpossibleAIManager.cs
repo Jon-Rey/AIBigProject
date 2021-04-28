@@ -19,19 +19,19 @@ public class ImpossibleAIManager : MonoBehaviour
     [SerializeField]
     private int Generation;
     private List<PlayerAI> Population = new List<PlayerAI>();
-    private List<PlayerAI> SortedPopulation;
     private bool AllChildrenDead = false;
     private System.Random random;
 
     private PlayerAI BestSoFar = null;
 
-    public enum GameState
+    public enum GAMESTATE
     {
         SETUP,
         FIRSTRUN,
         RUNNING,
         EVOLVING
     }
+    public GAMESTATE GameState = GAMESTATE.FIRSTRUN;
 
     /// <summary>
     /// Generate population
@@ -40,32 +40,157 @@ public class ImpossibleAIManager : MonoBehaviour
     {
         Generation = 1;
         random = new System.Random();
-        GeneratePopulation();
+        DoTestRun();
     }
+
+
+    public void Update()
+    {
+        if (GameState == GAMESTATE.FIRSTRUN)
+            CheckTestRun();
+        else if (GameState == GAMESTATE.RUNNING)
+            CheckChildrenState();
+    }
+
+
+    void CheckTestRun()
+    {
+        if (BestSoFar)
+        {
+            if (BestSoFar.currState == PlayerAI.STATE.FINISH)
+            {
+                BestSoFar.gameObject.SetActive(false);
+                GameState = GAMESTATE.SETUP;
+                GeneratePopulation();
+            }
+        }
+    }
+
+
+    void CheckChildrenState()
+    {
+        foreach (var child in Population)
+        {
+            switch (child.currState)
+            {
+                case PlayerAI.STATE.DEAD:
+                    AllChildrenDead = true;
+                    break;
+                case PlayerAI.STATE.ACTIVE:
+                    AllChildrenDead = false;
+                    break;
+                case PlayerAI.STATE.INACTIVE:
+                    AllChildrenDead = false;
+                    break;
+                case PlayerAI.STATE.FINISH:
+                    AllChildrenDead = false;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            if (AllChildrenDead == false)
+            {
+                break;
+            }
+        }
+
+
+        if (AllChildrenDead)
+        {
+            Debug.Log("all dead");
+            GameState = GAMESTATE.EVOLVING;
+            AllChildrenDead = false;
+            SurvivalSelection();
+
+        }
+    }
+
+    #region GEN_FUNCS
 
     private void GeneratePopulation()
     {
-        if (!IsFirstRun)
+        BestSoFar.ChromosomeLength = BestSoFar.CurrentChromosomeIndex;
+        Debug.Log($"Chromosome Length={BestSoFar.ChromosomeLength}");
+        for (int i = 0; i < populationSize; i++)
         {
-            BestSoFar.ChromosomeLength = BestSoFar.CurrentChromosomeIndex;
-            Debug.Log($"Chromosome Length={BestSoFar.ChromosomeLength}");
-            for (int i = 0; i < populationSize; i++)
-            {
-                PlayerAI playerAI = MakeNewPlayerAI();
-                Population.Add(playerAI);
-            }
-            SortedPopulation = Population.OrderByDescending(p => p.fitness).ToList();
-            foreach (var pop in Population)
-            {
-                pop.StartPlayerAI();
-            }
+            PlayerAI playerAI = MakeNewPlayerAI(RandChromo());
+            Population.Add(playerAI);
         }
-        else
+        Population = Population.OrderByDescending(p => p.fitness).ToList();
+
+        GameState = GAMESTATE.RUNNING;
+
+        foreach (var pop in Population)
         {
-            BestSoFar = MakeNewPlayerAI();
-            BestSoFar.StartPlayerAI_testRun();
+            pop.StartPlayerAI();
         }
     }
+
+    private void DoTestRun()
+    {
+        GameState = GAMESTATE.FIRSTRUN;
+        BestSoFar = MakeNewPlayerAI();
+        BestSoFar.StartPlayerAI_testRun();
+    }
+
+    void SurvivalSelection()
+    {
+        ResetAllChildren();
+        //Survival selection!
+        Generation += 1;
+
+        // n = calc how many children to remove from pop (always even)
+        // remove n worst members of the pop
+        // let's go with quarter pop removal
+        var quarterPop = Population.Count / 4;
+        Population.RemoveRange(quarterPop * 3, quarterPop);
+
+
+        List<PlayerAI> tempChildren = new List<PlayerAI>();
+        // select parents from the remaining pool and make n children
+        for (int i = 0; i < quarterPop / 2; i++)
+        {
+            PlayerAI[] parents = TournamentSelection(Population, Population.Count / 2);
+            PlayerAI[] children = Crossover(parents);
+
+            foreach (var child in children)
+            {
+                // should we mutate?
+                if (random.NextDouble() <= MutationRate)
+                {
+                    child.Chromosome = Mutation(child.Chromosome);
+                }
+                child.fitness = Fitness(child);
+
+                // removed children get replaced with the new children
+                tempChildren.Add(child);
+            }
+        }
+
+        foreach (var child in tempChildren)
+        {
+            Population.Add(child);
+        }
+        Population = Population.OrderByDescending(p => p.fitness).ToList();
+
+        GameState = GAMESTATE.RUNNING;
+        //Done with Survival Selection
+        foreach(var child in Population)
+        {
+            child.StartPlayerAI();
+        }
+    }
+
+    public void ResetAllChildren()
+    {
+        foreach (var child in Population)
+        {
+            child.ResetAi();
+        }
+    }
+    #endregion
+
+    #region HELPERS
 
     /// <summary>
     /// Select the best individuals in the current generation as parents. These will be used to produce offspring. 
@@ -76,11 +201,11 @@ public class ImpossibleAIManager : MonoBehaviour
     List<PlayerAI> SelectMatingPool()
     {
         var matingPool = new List<PlayerAI>();
-        //SortedPopulation = Population.OrderByDescending(p => p.fitness).ToList();
+        //Population = Population.OrderByDescending(p => p.fitness).ToList();
         // top half of the population gets to reproduce
-        for (int i = 0; i < Mathf.FloorToInt(SortedPopulation.Count / 2.0f); i++)
+        for (int i = 0; i < Mathf.FloorToInt(Population.Count / 2.0f); i++)
         {
-            matingPool.Add(SortedPopulation[i]);
+            matingPool.Add(Population[i]);
         }
         return matingPool;
     }
@@ -158,126 +283,36 @@ public class ImpossibleAIManager : MonoBehaviour
         return children;
     }
 
+    List<int> RandChromo()
+    {
+        // make a new player ai with a randomized chromosome
+        var randomChromosome = new List<int>(BestSoFar.ChromosomeLength);
+        for (int j = 0; j < BestSoFar.ChromosomeLength; j++)
+        {
+            randomChromosome.Add(random.NextDouble() < 0.5 ? 0 : 1);
+        }
+        return randomChromosome;
+    }
+
+    PlayerAI MakeNewPlayerAI(List<int> Chromo)
+    {
+        GameObject new_player = Instantiate(playerPrefab, SpawnPoint);
+        PlayerAI playerAI = new_player.GetComponent<PlayerAI>();
+        playerAI.fitness = Fitness(Chromo);
+        playerAI.Chromosome = Chromo;
+        new_player.GetComponent<PlayerScript>().Spawn = SpawnPoint.gameObject;
+        return playerAI;
+    }
+
     PlayerAI MakeNewPlayerAI()
     {
-        if (!IsFirstRun)
-        {
-            // make a new player ai with a randomized chromosome
-            var randomChromosome = new List<int>(BestSoFar.ChromosomeLength);
-            for (int j = 0; j < BestSoFar.ChromosomeLength; j++)
-            {
-                randomChromosome.Add(random.NextDouble() < 0.5 ? 0 : 1);
-            }
-            GameObject new_player = Instantiate(playerPrefab, SpawnPoint);
-            PlayerAI playerAI = new_player.GetComponent<PlayerAI>();
-            playerAI.fitness = Fitness(randomChromosome);
-            playerAI.Chromosome = randomChromosome;
-            new_player.GetComponent<PlayerScript>().Spawn = SpawnPoint.gameObject;
-            return playerAI;
-        }
-        else
-        {
-            GameObject new_player = Instantiate(playerPrefab, SpawnPoint);
-            PlayerAI playerAI = new_player.GetComponent<PlayerAI>();
-            new_player.GetComponent<PlayerScript>().Spawn = SpawnPoint.gameObject;
-            return playerAI;
-        }
+        GameObject new_player = Instantiate(playerPrefab, SpawnPoint);
+        PlayerAI playerAI = new_player.GetComponent<PlayerAI>();
+        new_player.GetComponent<PlayerScript>().Spawn = SpawnPoint.gameObject;
+        return playerAI;
     }
 
-    public void Update()
-    {
-        CheckChildrenState();
-    }
 
-    void CheckChildrenState()
-    {
-        if (!IsFirstRun)
-        {
-            foreach (var child in Population)
-            {
-                switch (child.currState)
-                {
-                    case PlayerAI.STATE.DEAD:
-                        AllChildrenDead = true;
-                        break;
-                    case PlayerAI.STATE.ACTIVE:
-                        AllChildrenDead = false;
-                        break;
-                    case PlayerAI.STATE.INACTIVE:
-                        AllChildrenDead = false;
-                        break;
-                    case PlayerAI.STATE.FINISH:
-                        AllChildrenDead = false;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-                if (AllChildrenDead == false)
-                {
-                    break;
-                }
-            }
-
-            if (AllChildrenDead)
-            {
-                Debug.Log("all dead");
-                SurvivalSelection();
-            }
-            else
-            {
-                Debug.Log("found best solution");
-            }
-        }
-        else
-        {
-            if (BestSoFar.currState != PlayerAI.STATE.FINISH) return;
-            IsFirstRun = false;
-            BestSoFar.gameObject.SetActive(false);
-            Debug.Log("gen pop");
-            AllChildrenDead = false;
-            GeneratePopulation();
-        }
-    }
-
-    void SurvivalSelection()
-    {
-        //Survival selection!
-        Generation += 1;
-
-        // n = calc how many children to remove from pop (always even)
-        // remove n worst members of the pop
-        // let's go with quarter pop removal
-        var quarterPop = SortedPopulation.Count / 4;
-        SortedPopulation.RemoveRange(quarterPop * 3, quarterPop);
-        Population = SortedPopulation;
-
-        List<PlayerAI> tempChildren = new List<PlayerAI>();
-        // select parents from the remaining pool and make n children
-        for (int i = 0; i < quarterPop / 2; i++)
-        {
-            PlayerAI[] parents = TournamentSelection(SortedPopulation, SortedPopulation.Count / 2);
-            PlayerAI[] children = Crossover(parents);
-
-            foreach (var child in children)
-            {
-                // should we mutate?
-                if (random.NextDouble() <= MutationRate)
-                {
-                    child.Chromosome = Mutation(child.Chromosome);
-                }
-                child.fitness = Fitness(child);
-
-                // removed children get replaced with the new children
-                tempChildren.Add(child);
-            }
-        }
-
-        foreach (var child in tempChildren)
-        {
-            Population.Add(child);
-        }
-        Debug.Log("survival selected");
-    }
 
     List<int> Mutation(List<int> gene)
     {
@@ -310,9 +345,10 @@ public class ImpossibleAIManager : MonoBehaviour
 
     void DeadChildGarbageCollection()
     {
-        var quarterPop = SortedPopulation.Count / 4;
+        var quarterPop = Population.Count / 4;
 
 
         // 
     }
+    #endregion
 }

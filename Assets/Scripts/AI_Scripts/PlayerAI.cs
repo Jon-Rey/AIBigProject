@@ -78,6 +78,12 @@ public class PlayerAI : MonoBehaviour
         playerScript.Moving = false;
     }
 
+    public void ResetAi()
+    {
+        currState = STATE.INACTIVE;
+        playerScript.Respawn();
+    }
+
     public void StartPlayerAI()
     {
         isTestRun = false;

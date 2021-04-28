@@ -81,7 +81,7 @@ public class PlayerScript : MonoBehaviour
         }
     }
     
-    void Respawn()
+    public void Respawn()
     {
         if (OnPlayerDeath != null)
         {
