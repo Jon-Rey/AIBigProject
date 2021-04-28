@@ -187,22 +187,14 @@ public class ImpossibleAIManager : MonoBehaviour
         {
             foreach (var child in Population)
             {
-                switch (child.currState)
+                if(child.currState == PlayerAI.STATE.ACTIVE)
                 {
-                    case PlayerAI.STATE.DEAD:
-                        AllChildrenDead = true;
-                        break;
-                    case PlayerAI.STATE.ACTIVE:
-                        AllChildrenDead = false;
-                        break;
-                    case PlayerAI.STATE.INACTIVE:
-                        AllChildrenDead = false;
-                        break;
-                    case PlayerAI.STATE.FINISH:
-                        AllChildrenDead = false;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                    AllChildrenDead = false;
+                    break;
+                }
+                else
+                {
+                    AllChildrenDead = true;
                 }
             }
             
