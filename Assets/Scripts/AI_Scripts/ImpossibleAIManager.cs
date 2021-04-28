@@ -24,6 +24,14 @@ public class ImpossibleAIManager : MonoBehaviour
     private System.Random random;
 
     private PlayerAI BestSoFar = null;
+    
+    public enum GameState
+    {
+        SETUP,
+        FIRSTRUN,
+        RUNNING,
+        EVOLVING
+    }
 
     /// <summary>
     /// Generate population
@@ -298,5 +306,13 @@ public class ImpossibleAIManager : MonoBehaviour
             }
         }
         return copygene;
+    }
+
+    void DeadChildGarbageCollection()
+    {
+        var quarterPop = SortedPopulation.Count / 4;
+        
+        
+        // 
     }
 }
