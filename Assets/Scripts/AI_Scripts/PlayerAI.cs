@@ -73,20 +73,9 @@ public class PlayerAI : MonoBehaviour
 
     private void HandlePlayerDeath(int dist)
     {
-        // if(isTestRun)
-        //     Debug.Log($"Died with dist traveled={dist} And JumpFrame Count={jumpFramCount}");
-        // else
-        //     Debug.Log($"Died with dist traveled={dist}");
-        currState = STATE.DEAD;
-        ResetAi();
-        playerScript.Moving = false;
-    }
-
-
-    private void ResetAi()
-    {
         CurrentChromosomeIndex = 0;
-
+        currState = STATE.DEAD;
+        playerScript.Moving = false;
     }
 
     public void StartPlayerAI()

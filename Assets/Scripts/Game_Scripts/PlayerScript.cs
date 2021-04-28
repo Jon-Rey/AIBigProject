@@ -36,23 +36,10 @@ public class PlayerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        frameCount += 1;
-        if (Moving)
-        {
-            oldpos = transform.position;
-            transform.position += new Vector3(Speed * 0.005f, 0.0f, 0.0f);
-            if (oldpos == transform.position)
-            {
-                StartCoroutine(Respawn());
-            }
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                
-                Debug.Log("Jump");
-                Jump();
-
-            }
-        }
+        if (!Moving) return;
+        
+        oldpos = transform.position;
+        transform.position += new Vector3(Speed * 0.005f, 0.0f, 0.0f);
     }
 
     public void Jump()
@@ -93,6 +80,7 @@ public class PlayerScript : MonoBehaviour
             PlayerAIScript.currState = PlayerAI.STATE.FINISH;
         }
     }
+    
     IEnumerator Respawn()
     {
         if (OnPlayerDeath != null)
