@@ -35,7 +35,7 @@ public class PlayerAI : MonoBehaviour
         INACTIVE,
         FINISH
     }
-    public STATE currState;
+    public STATE currState = STATE.INACTIVE;
 
     // Start is called before the first frame update
     void Awake()
