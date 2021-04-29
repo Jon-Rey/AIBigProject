@@ -40,7 +40,7 @@ public class PlayerScript : MonoBehaviour
         
         frameCount += 1;
         oldpos = transform.position;
-        transform.position += new Vector3(Speed * 0.005f, 0.0f, 0.0f);
+        transform.position += new Vector3(Speed * 0.5f*Time.deltaTime, 0.0f, 0.0f);
     }
 
     public void Jump()

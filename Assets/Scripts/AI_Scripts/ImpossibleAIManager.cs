@@ -136,12 +136,12 @@ public class ImpossibleAIManager : MonoBehaviour
         // remove n worst members of the pop
         // let's go with quarter pop removal
         var quarterPop = Population.Count / 4;
-        for (int i = quarterPop*3; i < quarterPop*3+quarterPop; i++)
+        for (int i = quarterPop*3; i < Population.Count; i++)
         {
             PlayerAI tempPlayer = Population[i];
-            Population.Remove(tempPlayer);
             DiscardedChildren.Enqueue(tempPlayer);
         }
+        Population.RemoveRange(quarterPop * 3, quarterPop);
 
 
         List<PlayerAI> tempChildren = new List<PlayerAI>();
@@ -277,7 +277,6 @@ public class ImpossibleAIManager : MonoBehaviour
             }
             // TODO: need to instantiate the children to be able to do anything like this.
             children[i] = ReusePlayerAI(tempChromo);
-
         }
         return children;
     }
