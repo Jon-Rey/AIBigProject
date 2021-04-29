@@ -100,10 +100,19 @@ public class PlayerAI : MonoBehaviour
     {
         if (!isTestRun && currState == STATE.ACTIVE)
         {
-            if(Chromosome[CurrentChromosomeIndex] == 1)
+            try 
             {
-                playerScript.Jump();
+
+                if (Chromosome[CurrentChromosomeIndex] == 1)
+                {
+                    playerScript.Jump();
+                }
             }
+            catch
+            {
+                //Forgive me bash ;-;
+            }
+
         }
         else if(isTestRun)
         {

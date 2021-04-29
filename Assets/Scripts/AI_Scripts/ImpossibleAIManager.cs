@@ -317,6 +317,7 @@ public class ImpossibleAIManager : MonoBehaviour
         }
 
         PlayerAI new_child = DiscardedChildren.Dequeue();
+        new_child.ResetAi();
         new_child.fitness = Fitness(Chromo);
         new_child.Chromosome = Chromo;
         new_child.GetComponent<PlayerScript>().Spawn = SpawnPoint.gameObject;

@@ -180,7 +180,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Player: {fileID: 8157715327666433690}
   Spawn: {fileID: 0}
-  Speed: 12
+  Speed: 20
   Jump_force: 380
   oldpos: {x: 0, y: 0, z: 0}
   Moving: 0
@@ -208,4 +208,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44b43e0fbb666874ebd160f49b2e9f4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jump_time_buffer: 0.5
+  ChromosomeLength: 0
+  CurrentChromosomeIndex: 0
+  currState: 2
