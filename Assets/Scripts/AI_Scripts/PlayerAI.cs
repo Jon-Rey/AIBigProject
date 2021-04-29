@@ -23,7 +23,8 @@ public class PlayerAI : MonoBehaviour
 
     private bool isTestRun = true;
 
-    PlayerScript playerScript;
+    [HideInInspector]
+    public PlayerScript playerScript;
 
     public enum STATE
     {

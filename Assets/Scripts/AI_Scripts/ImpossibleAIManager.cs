@@ -82,6 +82,12 @@ public class ImpossibleAIManager : MonoBehaviour
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
+            if(child.playerScript.Get_On_ground() == false)
+            {
+                AllChildrenDead = false;
+            }
+
             if (AllChildrenDead == false)
             {
                 break;
