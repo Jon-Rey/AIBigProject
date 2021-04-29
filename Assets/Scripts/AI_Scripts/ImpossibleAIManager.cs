@@ -22,6 +22,7 @@ public class ImpossibleAIManager : MonoBehaviour
     public int Generation { get; private set; }
     
     private List<PlayerAI> Population = new List<PlayerAI>();
+    private List<PlayerAI> DestroyPop = new List<PlayerAI>();
     private bool AllChildrenDead = false;
     private PlayerAI BestSoFar = null;
     private System.Random random;
@@ -135,7 +136,13 @@ public class ImpossibleAIManager : MonoBehaviour
         // remove n worst members of the pop
         // let's go with quarter pop removal
         var quarterPop = Population.Count / 4;
-        Population.RemoveRange(quarterPop * 3, quarterPop);
+        for (int i = quarterPop*3; i < quarterPop*3+quarterPop; i++)
+        {
+            PlayerAI tempPlayer = null;
+            tempPlayer = Population[i];
+            Population.Remove(tempPlayer);
+            DestroyPop.Add(tempPlayer);
+        }
 
 
         List<PlayerAI> tempChildren = new List<PlayerAI>();
@@ -269,8 +276,9 @@ public class ImpossibleAIManager : MonoBehaviour
                 tempChromo[j] = 
                     random.NextDouble() < 0.5 ? parents[0].Chromosome[i] : parents[1].Chromosome[i];
             }
-            // TODO: need to instantiate the children to be able to do anything like this. 
-            // children[i].Chromosome = new List<int>(tempChromo);
+            // TODO: need to instantiate the children to be able to do anything like this.
+            children[i] = MakeNewPlayerAI(tempChromo);
+
         }
         return children;
     }
@@ -302,7 +310,6 @@ public class ImpossibleAIManager : MonoBehaviour
         new_player.GetComponent<PlayerScript>().Spawn = SpawnPoint.gameObject;
         return playerAI;
     }
-
 
 
     List<int> Mutation(List<int> gene)
