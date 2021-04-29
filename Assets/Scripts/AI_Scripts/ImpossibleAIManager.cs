@@ -22,7 +22,7 @@ public class ImpossibleAIManager : MonoBehaviour
     public int Generation { get; private set; }
     
     private List<PlayerAI> Population = new List<PlayerAI>();
-    private List<PlayerAI> DestroyPop = new List<PlayerAI>();
+    private Queue<PlayerAI> DiscardedChildren = new Queue<PlayerAI>();
     private bool AllChildrenDead = false;
     private PlayerAI BestSoFar = null;
     private System.Random random;
@@ -138,10 +138,9 @@ public class ImpossibleAIManager : MonoBehaviour
         var quarterPop = Population.Count / 4;
         for (int i = quarterPop*3; i < quarterPop*3+quarterPop; i++)
         {
-            PlayerAI tempPlayer = null;
-            tempPlayer = Population[i];
+            PlayerAI tempPlayer = Population[i];
             Population.Remove(tempPlayer);
-            DestroyPop.Add(tempPlayer);
+            DiscardedChildren.Enqueue(tempPlayer);
         }
 
 
@@ -277,7 +276,7 @@ public class ImpossibleAIManager : MonoBehaviour
                     random.NextDouble() < 0.5 ? parents[0].Chromosome[i] : parents[1].Chromosome[i];
             }
             // TODO: need to instantiate the children to be able to do anything like this.
-            children[i] = MakeNewPlayerAI(tempChromo);
+            children[i] = ReusePlayerAI(tempChromo);
 
         }
         return children;
@@ -309,6 +308,21 @@ public class ImpossibleAIManager : MonoBehaviour
         PlayerAI playerAI = new_player.GetComponent<PlayerAI>();
         new_player.GetComponent<PlayerScript>().Spawn = SpawnPoint.gameObject;
         return playerAI;
+    }
+
+    PlayerAI ReusePlayerAI(List<int> Chromo)
+    {
+        if (DiscardedChildren.Count <= 0)
+        {
+            throw new Exception("No Discarded children left to use.");
+        }
+
+        PlayerAI new_child = DiscardedChildren.Dequeue();
+        new_child.fitness = Fitness(Chromo);
+        new_child.Chromosome = Chromo;
+        new_child.GetComponent<PlayerScript>().Spawn = SpawnPoint.gameObject;
+
+        return new_child;
     }
 
 
